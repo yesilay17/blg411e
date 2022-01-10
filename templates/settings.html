@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+  {% block content %}
+  
+  <div style="width: 50%; float: left"> 
+    <img class="center" width="100%"  src="{{url_for('static', filename='logo.jpg')}}"></img>
+    <p style="text-align: center; font-family:cursive; font-size: 18px">Traveller Blog</p>
+  </div>
+  <div style="width: 40%; float: left;"> 
+    <form action="" method="post" enctype="multipart/form-data">
+      <br>
+      <div class="input-group">
+          
+          <div class="input-group-prepend" >
+            <span class="input-group-text" id="inputGroup-sizing-default" >Name</span>
+          </div> 
+            <input type="text" name="first_name"  class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"  required="required" value='{{user.first_name}}'/>
+      </div>
+      <br>
+      <div class="input-group">
+          <div class="input-group-prepend" >
+            <span class="input-group-text" id="inputGroup-sizing-default" >Surname</span>
+          </div> 
+            <input type="text" name="last_name"  class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"  required="required" value='{{user.last_name}}'/>
+      </div>
+      <br>
+      <div class="input-group">
+          <div class="input-group-prepend" >
+            <span class="input-group-text" id="inputGroup-sizing-default" >E-Mail</span>
+          </div> 
+            <input type="email" name="email"  class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"  required="required" value='{{user.email}}' readonly="True"/>
+      </div>
+      <br>
+      <div class="input-group">
+          <div class="input-group-prepend" >
+            <span class="input-group-text" id="inputGroup-sizing-default" >Birthday</span>
+          </div> 
+            <input type="date" name="birth_date"  class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"  required="required" value='{{user.birth_date}}'/>
+      </div>
+      <br>
+      <div class="input-group">
+        <div class="input-group-prepend" >
+          <span class="input-group-text" id="inputGroup-sizing-default" >Profile Image</span>
+        </div> 
+          <input type="file" name="profile_image" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" accept="image/*"/>
+      </div>
+      <br>
+      <div class="input-group">
+          <div class="input-group-prepend" >
+            <span class="input-group-text" id="inputGroup-sizing-default" >Private Account
+          <span style="padding-left: 190px;">
+          <div class="form-check form-switch">
+            {% if user.private_account == False %}
+            <input class="form-check-input" style="width: 40px;"  type="checkbox" name="private_account" id="private">
+            {% elif user.private_account == True %}
+            <input class="form-check-input" style="width: 40px;"  type="checkbox" name="private_account" id="private" checked>
+            {% endif %}
+          </div>
+          
+          </span>
+          </span>
+          <br>
+          <label for="private">If you choose private account, only your followers can see what you have shared.</label>
+          </div>           
+          
+      </div>
+      <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">Delete profile image
+          <span style="padding-left: 190px;">
+          <div class="form-check form-switch">
+            <input class="form-check-input" style="width: 40px;"  type="checkbox" name="delete_profile_image">
+          </div>          
+          </span>
+          </span>
+          <br><br>
+          </div>           
+          <div style="margin-left: auto; margin-right: auto; float: center; ">
+            <button class="btn btn-success" type="submit">Update</button>
+          </div>
+      </div>
+
+  </form>
+</div>
+{%endblock%}

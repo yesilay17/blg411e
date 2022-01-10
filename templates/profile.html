@@ -1,0 +1,623 @@
+{% extends "layout.html" %}
+{% block title %} Profile {% endblock %}
+{% block content_user %}
+  <p style="font-size: larger; font-weight: bold; text-align: center;" >{{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+  <div style="display: flex; justify-content: center;">
+    {% if profile_user.profile_image %}
+      <img src="{{url_for('static', filename=profile_user.profile_image.filename)}}" class="img-responsive" alt="Anonymous profile picture" style="float: none;
+      margin: 0 auto;
+      width: 50%;
+      height: 50%;
+      -webkit-border-radius: 50% !important;
+      -moz-border-radius: 50% !important;
+      border-radius: 50% !important;">
+    {% else %}
+      <img src="{{url_for('static', filename='anonymous.png')}}" class="img-responsive" alt="Anonymous profile picture" style="float: none;
+      margin: 0 auto;
+      width: 50%;
+      height: 50%;
+      -webkit-border-radius: 50% !important;
+      -moz-border-radius: 50% !important;
+      border-radius: 50% !important;">
+    {% endif %}
+  </div>
+  <table class="table">
+    <tr>
+      <div style="text-align:center">
+        {% if user.email != profile_user.email %}
+          {% if follow_status == "following" %}
+            <button id="unfollow" class="btn btn-danger">Unfollow</button>
+          {% elif follow_status == "not_following" %}
+            <button id="follow" class="btn btn-primary">Follow</button>
+          {% else %}
+            <button id="waiting" class="btn btn-primary">Request sent</button>
+          {% endif %}    
+        {% endif %}
+      </div>
+    </tr>
+    <tr>
+      <td scope="col"><a class="link-light" style="font-family: Arial, sans-serif; color: #66a8ff; text-decoration: none;" id="follower_count" href="#modal-follower" data-toggle="modal" data-target="#modal-follower">Follower: {{accepted_followers|length}} </a></td>
+      <td scope="col"><a class="link-light" style="font-family: Arial, sans-serif; color: #66a8ff; text-decoration: none;" id="following_count" href="#modal-following" data-toggle="modal" data-target="#modal-following">Following: {{accepted_followings|length}} </a></td>
+    </tr>
+    {% if user.email == profile_user.email %}
+      {% for waiting_follower in waiting_followers %}
+        <tr> 
+          <td scope="col">{{waiting_follower.first_name}} {{waiting_follower.last_name}}</td>
+          <td scope="col"><button class="accept" class="btn btn-primary" onclick="accept(this, '{{waiting_follower.email}}', '{{user.email}}')">Accept</button></td>
+          <td scope="col"><button class="reject" class="btn btn-danger" onclick="reject(this, '{{waiting_follower.email}}', '{{user.email}}')">Reject</button></td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  </table>
+
+  <!--Follower Modal -->
+<div class="modal fade" id="modal-follower" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Followers</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          {% for follower in accepted_followers %}
+          <tr>           
+              <td style="text-align: center;">
+                <a class="link-light" href="{{follower.email}}" style="font-family: Arial, sans-serif; color: #66a8ff; text-decoration: none;">{{follower.first_name}} {{follower.last_name}}</a>
+              </td>
+              {% if user.email == profile_user.email %}  
+                <td><button class="btn btn-danger" onclick="unfollow_list(this, '{{follower.email}}', '{{user.email}}')">Remove Follower</button></td>        
+              {% endif %}
+            </tr>  
+          {% endfor %}  
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Following Modal -->
+<div class="modal fade" id="modal-following" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Following</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          {% for following in accepted_followings %}
+          <tr>
+            <td style="text-align: center;">
+              <a class="link-light" href="{{following.email}}" style="font-family: Arial, sans-serif; color: #66a8ff; text-decoration: none;">{{following.first_name}} {{following.last_name}}</a>
+            </td>         
+            {% if user.email == profile_user.email %}  
+            <td><button class="btn btn-danger" onclick="unfollow_list(this, '{{user.email}}', '{{following.email}}')">Unfollow</button></td>        
+            {% endif %}  
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+  <script type="text/javascript">
+    function handleMouseEnter(e) {
+      e.target.setAttribute("class", "btn btn-danger")
+      e.target.innerHTML = "Withdraw request"
+    }
+
+    function handleMouseLeave(e) {
+      e.target.setAttribute("class", "btn btn-primary")
+      e.target.innerHTML = "Request sent"
+    }
+
+    function follow(el, follower, followed) {
+      fetch('/follower/'+follower+"/"+followed+"/follow");
+      const new_button = document.createElement("button")
+      new_button.setAttribute("class", "btn btn-danger")
+      new_button.setAttribute("id", "waiting")
+      new_button.innerHTML = "Withdraw request"
+      new_button.addEventListener("mouseenter", handleMouseEnter)
+      new_button.addEventListener("mouseleave", handleMouseLeave)
+      new_button.addEventListener("click", () => unfollow(new_button, follower, followed), false)
+      parent = el.parentNode
+      parent.appendChild(new_button)
+      el.remove()
+    }
+
+    function unfollow(el, follower, followed) {
+      fetch('/follower/'+follower+"/"+followed+"/unfollow")
+      const new_button = document.createElement("button")
+      new_button.setAttribute("class", "btn btn-primary")
+      new_button.setAttribute("id", "follow")
+      new_button.innerHTML = "Follow"
+      new_button.addEventListener("click", () => follow(new_button, follower, followed), false)
+      parent = el.parentNode
+      parent.appendChild(new_button)
+      el.remove()
+    }
+
+    function unfollow_list(el, follower, followed) {
+      fetch('/follower/'+follower+"/"+followed+"/unfollow")
+      el.parentNode.parentNode.remove()
+    }
+
+    function accept(el, follower, followed) {
+      console.log(el)
+      fetch('/follower/'+follower+"/"+followed+"/accept");
+      el.parentNode.parentNode.remove()
+      follower_count = document.getElementById("follower_count")
+      let current_follower_count = {{accepted_followers|length}}
+      current_follower_count++
+      follower_count.innerHTML = `Follower: ${current_follower_count}`
+    }
+
+    function reject(el, follower, followed) {
+      console.log(el)
+      fetch('/follower/'+follower+"/"+followed+"/reject");
+      el.parentNode.parentNode.remove()
+    }
+
+    follow_button = document.getElementById("follow")
+    unfollow_button = document.getElementById("unfollow")
+    waiting_button = document.getElementById("waiting")
+
+    if (follow_button) {
+      follow_button.addEventListener("click", () => follow(follow_button, "{{user.email}}", "{{profile_user.email}}"), false)
+    }
+    if (unfollow_button) {
+      unfollow_button.addEventListener("click", () => unfollow(unfollow_button, "{{user.email}}", "{{profile_user.email}}"), false)
+    }
+    if (waiting_button) {
+      waiting_button.addEventListener("mouseenter", handleMouseEnter)
+      waiting_button.addEventListener("mouseleave", handleMouseLeave)
+      waiting_button.addEventListener("click", () => unfollow(waiting_button, "{{user.email}}", "{{profile_user.email}}"), false)
+    }
+
+
+  </script>
+{%endblock%}
+
+{% block content %} 
+  <!-- 
+      following_amount, follower_amount and Trips of user
+  -->
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {box-sizing: border-box}
+img {vertical-align: middle;}
+
+.slideshow-container {
+  max-width: 1000px;
+  position: relative;
+  margin: auto;
+}
+
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: gray;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+}
+
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+.prev{
+  left: 0;
+}
+
+.prev:hover, .next:hover {
+  background-color: rgba(0,0,0,0.8);
+}
+
+/* The Modal (background) */
+.modalimg {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modalimg-content {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+}
+
+/* Caption of Modal Image */
+#caption {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 10px 0;
+  height: 150px;
+}
+
+/* Add Animation */
+.modalimg-content, #caption {  
+  -webkit-animation-name: zoom;
+  -webkit-animation-duration: 0.6s;
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+  from {-webkit-transform:scale(0)} 
+  to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
+}
+
+/* The Close Button */
+.closeimg {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.closeimg:hover,
+.closeimg:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 700px){
+  .modalimg-content {
+    width: 100%;
+  }
+}
+
+
+</style>
+   <table class="table table-hover" style="margin-left: auto;
+      margin-right: auto; width: 80%; float: center; " onload="map_display()">
+    {% if user.email == profile_user.email or follower_status or not profile_user.private_account %}
+      {% for t in Trips %}
+          <tr class="border">
+            <td id="td{{t.trip_id}}" style="text-align: center; float: center; padding-left: 30px; padding-right: 30px" >
+            
+            <nav style="color: white;" class="rounded navbar navbar-dark bg-dark"><span style="text-align: center; margin-left: auto; 
+                  margin-right: auto; font-family: Copperplate, 'Copperplate Gothic Light', fantasy; font-size: 18px;"> {{t.title}}</span></nav>
+            <br>
+            
+            <nav style="color: white; font-size: 13px; padding-left: 10px;padding-right: 10px; text-align: left; float: left;  width: 30%" class="rounded navbar navbar-dark bg-primary">
+                <span><a class="link-light" href="/profile/{{t.email.email}}" style="font-family: Arial, sans-serif; color: #ffcc66; text-decoration: none;"> 
+                  {% if t.email.profile_image %}
+                    <img class="rounded-circle" src="{{url_for('static', filename=profile_user.profile_image.filename)}}" style="width: 15%"> 
+                    {% else %}
+                    <img class="rounded-circle" src="{{url_for('static', filename='anonymous.png')}}" style="width: 15%;">
+                    {% endif %}
+                  {{t.email.first_name}} {{t.email.last_name}}
+              </a></span>
+            </nav>
+            <span style="float: right; ">
+              {% if t.email.email==user.email %}
+                <i style="font-size: 30px; color: red;" onclick="remove_trip('{{t.trip_id}}')" class="bi bi-x-circle"></i>
+              {% endif %}
+            </span>
+
+            <br><br>
+
+            <p style="text-align: left">
+              <i id="icon{{t.trip_id}}" onclick="route({{t.trip_id}})" class="bi bi-signpost" style="font-size: 30px; color: blue;"></i>Route: {{t.route}}
+            </p>
+
+              <div id="map{{t.trip_id}}" style="margin-left: auto; margin-right: auto; width: 80%; float: center; ">
+                <div id="route{{trip_id}}" style=" height: 200px;"  class="map",  coordinates="{{t.route_coordinates}}">
+                </div><span style="font-size:10px; float: right; ">Click route icon to close the map.</span>
+                <br>
+              </div>
+
+              <div class="slideshow-container">
+              {% for i in t.images %}
+                {% if t.images|length>1%}
+                <div class="mySlides{{t.trip_id}}">
+                    <img id="img{{i.image_id}}" onclick="modalimg(img{{i.image_id}})" class="rounded" src="{{url_for('static', filename=i.filename)}}" style="width: 80%; cursor: pointer;" />
+                </div>
+                {%else%}
+                <div>
+                    <img id="img{{i.image_id}}" onclick="modalimg(img{{i.image_id}})" class="rounded" src="{{url_for('static', filename=i.filename)}}" style="width: 80%;cursor: pointer;" />
+                </div>
+                {% endif %}
+              {% endfor %}
+
+
+                <div id="modal_div" class="modalimg">
+                    <span class="closeimg">&times;</span>
+                    <img id="modal_img" class="rounded"/>
+                </div>
+
+
+              {% if t.images|length>1%}
+              <span class="prev" onclick="plusSlides(-1, {{t.trip_id}})">&#10094;</span>
+              <span class="next" onclick="plusSlides(1, {{t.trip_id}})">&#10095;</span>
+              {% endif %}
+              <br> 
+              </div>
+
+              <div style="padding-left: 30px; padding-right: 30px;">
+                <p style="text-align: left; font-family: Arial, sans-serif; font-size: 15px;">{{t.text}}{% if t.blogs %}<a href="/trip{{t.trip_id}}">...read more</a></p>{% endif %}
+              </div>
+
+              <div>
+              <span id="number_of_thumbs{{t.trip_id}}">{{t.thumbs|length}}</span>
+
+              {% if t.is_liked %}
+                  <i onclick="thumb(thumb{{t.trip_id}}, number_of_thumbs{{t.trip_id}}, {{t.trip_id}})" style="font-size: 30px; color: red;" class="bi bi-hand-thumbs-up-fill" id="thumb{{t.trip_id}}" >
+                    
+                  </i>
+                {% else %}
+                  <i onclick="thumb(thumb{{t.trip_id}}, number_of_thumbs{{t.trip_id}}, {{t.trip_id}})" style="color: black; font-size:  30px;" class="bi bi-hand-thumbs-up" id="thumb{{t.trip_id}}"></i>
+                {% endif %}
+
+              <span id="number_of_comments{{t.trip_id}}">{{t.comments|length}}</span>
+              <i onclick="comment_display(comment_display{{t.trip_id}})" style="font-size:  30px;" class="bi bi-chat-left-text"></i>
+
+              <i onclick="comment(comment_block{{t.trip_id}})" style="font-size:  30px; padding-left: 10px;" class="bi bi-pencil"></i>
+              </div>
+              <div id="comment_block{{t.trip_id}}" class="border" style="display: none;">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span style="background-color: black; color: white; " class="input-group-text" id="inputGroup-sizing-default" >{{user.first_name}} {{user.last_name}}</span>
+                  </div> 
+                  <textarea class="form-control"  rows="1" name="text" aria-label="Default" aria-describedby="inputGroup-sizing-default" placeholder="Comment..."  method="post" id="comment{{t.trip_id}}" ></textarea>
+                  <button class="btn btn-info" onclick="send_comment(comment{{t.trip_id}}, comment_block{{t.trip_id}}, {{t.trip_id}}, td{{t.trip_id}}, number_of_comments{{t.trip_id}})">Submit</button>
+                </div>
+                
+              </div>
+              <br>
+              <div id="comment_display{{t.trip_id}}" style="display: none;">
+              {% for c in t.comments %}
+                  <div class="input-group" id="{{t.trip_id}}comment_div{{c.date}}">
+                    <div class="input-group-prepend" >
+                      <a href="/profile/{{c.email.email}}" style="text-decoration: none;"><span class="input-group-text" id="inputGroup-sizing-default" >{{c.email.first_name}} {{c.email.last_name}}</span></a>
+                    </div> 
+                    <a href=""></a><p style="text-align: left" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                      
+                      {{c.text}} <span style="font-size:10px; float: right; ">
+                        {% if c.email.email==user.email or t.email.email==user.email %}
+                          <i style="font-size: 20px; color: red;" onclick="remove_comment('{{t.trip_id}}comment_div{{c.date}}', '{{c.date}}', '{{c.text}}', {{t.trip_id}}, number_of_comments{{t.trip_id}})" class="bi bi-x-circle"></i>
+                        {% endif %}
+                      {{c.date}}</span>
+                    </p>
+                  </div>
+              {% endfor %}
+              </div>
+              
+          </td>
+          </tr>
+      {% endfor %}
+    {% else %}
+          <p class="h3" style="text-align: center;">This account is private. You need to follow {{profile_user.first_name}} {{profile_user.last_name}}</p>
+    {% endif %}
+ </table>
+  
+<script type="text/javascript">
+  function remove_trip(tripid) {
+    fetch('/delete_trip/'+String(tripid));
+    var td = document.getElementById("td"+String(tripid));
+    td.remove();
+  }
+
+  function remove_comment(div ,date, text, tripid, number_of_comments) {
+    number_of_comments.innerHTML=parseInt(number_of_comments.innerHTML)-1;
+    fetch('/comment/'+String(tripid)+"/"+String(-1)+"/"+String(text)+"/"+String(date)+"/delete");
+    var div = document.getElementById(div);
+    div.remove();
+  }
+
+
+  function comment_display(d) {
+    if (d.style.display=="none"){
+      d.style.display="block";
+    }
+    else{
+      d.style.display="none";
+    }
+  }
+
+  function modalimg(img) {
+    console.log("pass");
+    console.log(img);
+    var div = document.getElementById("modal_div");
+    var modal_img = document.getElementById("modal_img");
+    div.style.display="block";
+    modal_img.style.width = "70%";
+    modal_img.src=img.src;
+    maps = document.getElementsByClassName("map");
+    var i=0;
+    for (i = 0; i < maps.length; i++) {
+        maps[i].style.display = "none";  
+    }
+  }
+
+  var span = document.getElementsByClassName("closeimg")[0];
+
+  span.onclick = function() { 
+    var div = document.getElementById("modal_div");
+    div.style.display = "none";
+    maps = document.getElementsByClassName("map");
+    var i=0;
+    for (i = 0; i < maps.length; i++) {
+        maps[i].style.display = "block";  
+    }
+  }
+
+  function route(tripid) {
+    var map = document.getElementById("map"+String(tripid));
+    var icon = document.getElementById("icon"+String(tripid));
+    if (map.style.display == "none") {
+      map.style.display = "block";
+      icon.style.color = "blue";
+    }
+    else{
+      map.style.display = "none";
+      icon.style.color = "black";
+    }
+  }
+
+  var slideIndex = {};
+  {% for t in Trips %}
+    {%if t.images|length>1 %}
+    slideIndex["{{t.trip_id}}"]=1; 
+    {% endif %} 
+  {% endfor %}
+
+  {% for t in Trips %}
+    {%if t.images|length>1 %}
+    showSlides(slideIndex["{{t.trip_id}}"], "{{t.trip_id}}");
+    {% endif %} 
+  {% endfor %}
+
+  function plusSlides(n, tripid) {
+    showSlides(slideIndex[String(tripid)] += n, String(tripid));
+  }
+
+  function showSlides(n, tripid) {
+    slides = document.getElementsByClassName("mySlides"+String(tripid));
+    var i=0;
+    if (n > slides.length) {slideIndex[String(tripid)] = 1}    
+    if (n < 1) {slideIndex[String(tripid)] = slides.length}
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";  
+    }
+    slides[slideIndex[String(tripid)]-1].style.display = "block";  
+  }
+
+
+  function send_comment(comment, block, tripid, td, number_of_comments) {
+    number_of_comments.innerHTML=parseInt(number_of_comments.innerHTML)+1;
+
+    let div1 = document.createElement('div');
+    div1.setAttribute("class", "input-group");
+
+    let div2 = document.createElement('div');
+    div2.setAttribute("class", "input-group-prepend");
+
+    let span = document.createElement('span');
+    span.setAttribute("class", "input-group-text");
+    span.innerHTML = "{{user.first_name}}"+" "+"{{user.last_name}}";
+
+    let p = document.createElement('p');
+    p.setAttribute("class", "form-control");
+    p.setAttribute("aria-label", "Default");
+    p.setAttribute("aria-describedby", "inputGroup-sizing-default");
+    p.style.textAlign="left"
+    p.innerHTML = comment.value;
+    
+    var currentdate = new Date();
+    var month = 0; 
+    var date = 0;
+    var hours = 0;
+    var minutes = 0;
+    var seconds = 0;
+    if(currentdate.getMonth()<9){month = "0"+String(currentdate.getMonth()+1);}
+    else{month = String(currentdate.getMonth()+1);}
+
+    if(currentdate.getDate()<10){date = "0"+String(currentdate.getDate());}
+    else{date = String(currentdate.getDate());}
+
+    if(currentdate.getHours()<10){hours = "0"+String(currentdate.getHours());}
+    else{hours = String(currentdate.getHours());}
+
+    if(currentdate.getMinutes()<10){minutes = "0"+String(currentdate.getMinutes());}
+    else{minutes = String(currentdate.getMinutes());}
+
+    if(currentdate.getSeconds()<10){seconds = "0"+String(currentdate.getSeconds());}
+    else{seconds = String(currentdate.getSeconds());}
+
+    var datetime = currentdate.getFullYear()+ "-" 
+                + month +"-" 
+                + date + " "
+                + hours + ":"  
+                + minutes + ":" 
+                + seconds;
+    
+    fetch('/comment/'+String(tripid)+"/"+String(-1)+"/"+String(comment.value)+"/"+String(datetime)+"/add");
+    let span_date = document.createElement('span');
+    span_date.style.fontSize="10px";
+    span_date.style.float="right";
+    span_date.innerHTML = String(datetime);
+
+    comment.value="";
+    block.style.display = "none";
+    var a_href = document.createElement('a');
+    a_href.setAttribute("href", "/profile/{{user.email}}")
+    a_href.style.textDecoration="none";
+    td.appendChild(div1);
+    div1.appendChild(div2);
+    div2.appendChild(a_href);
+    a_href.appendChild(span);
+    div1.appendChild(p);
+    p.appendChild(span_date);
+  }
+
+  function thumb(t, n, tripid) {
+    if(t.getAttribute("class") == "bi bi-hand-thumbs-up"){
+      t.style.color="red";
+      t.setAttribute("class", "bi bi-hand-thumbs-up-fill");
+      n.innerHTML=parseInt(n.innerHTML)+1;
+      fetch('/thumb/'+String(tripid)+"/"+String(-1)+"/add");
+      }
+    else{
+      t.setAttribute("class", "bi bi-hand-thumbs-up");
+      t.style.color="black";
+      n.innerHTML=parseInt(n.innerHTML)-1;
+      fetch('/thumb/'+String(tripid)+"/"+String(-1)+"/delete");
+    }
+  }
+
+  function comment(block_id) {
+    if (block_id.style.display == "block"){
+      block_id.style.display = "none";
+    }
+    else{
+      block_id.style.display = "block";
+    } 
+  }
+</script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+crossorigin=""></script>
+<script src="{{url_for('static', filename='map.js')}}"></script>
+{%endblock%}

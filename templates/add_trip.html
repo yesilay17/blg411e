@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+  {% block content %}
+
+  <form action="" method="post" name="trip" enctype="multipart/form-data">
+    <table class="table table-hover" style="margin-left: auto; margin-right: auto; width: 80%;">
+      <tr>
+          <td>
+            <div class="control"> 
+              <input type="text" name="title" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" required="required" placeholder="Title"/>
+            </div>
+          </td>
+        </tr>
+        <tr class="route_field">
+          <td>
+            <div class="control"> 
+              <input type="text" name="route1" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" required="required" placeholder="Route"/>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="control"> 
+              <button type="button" class="btn btn-success" id="add_route_button">
+                <i class="bi bi-plus"></i>Add New Route
+              </button>
+              <button style="display: none;" type="button" class="btn btn-danger" id="remove_route_button">
+                <i class="bi bi-x"></i>Remove Last Route
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="mb-3">
+              <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="text" placeholder="Text..."></textarea>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="mb">
+              <p>Add images:</p>
+              <input class="form-control" type="file" name="file" id="formFileMultiple" accept="image/*" multiple>
+          </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="field is-grouped">
+              <div class="control"  style="width: 15%; margin-left: auto; margin-right: auto;">
+                <button  class="btn btn-outline-info">Post Trip</button>
+              </div>
+           </div>
+          </td>
+        </tr>
+   </table>
+  </form>
+  <script src="{{url_for('static', filename='route_field.js')}}"></script>
+{%endblock%}

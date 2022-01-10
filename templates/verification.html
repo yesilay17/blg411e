@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block title %} {% endblock %}
+  {% block content %} 
+ <br>
+  <form action="" method="post"  class="input" name="verification">
+     <table class="table table-hover" style="margin-left: auto;
+      margin-right: auto; width: 30%;">
+      {% if warning %}
+      <p style="color: red; text-align:center ; ">{{warning}}!</p>
+      {% endif %}
+      <tr>
+        <td style="text-align: center">
+            Please check your email and type the verification code in <p id="countdown" ></p>
+        </td>  
+      </tr>
+      <tr>
+        <td style="text-align: center;">
+            <input type="number" name="number1" class="input" required="required" min="0" max="9" maxlength="1"/>
+            <input type="number" name="number2" class="input" required="required" min="0" max="9" maxlength="1"/>
+            <input type="number" name="number3" class="input" required="required" min="0" max="9" maxlength="1"/>
+            <input type="number" name="number4" class="input" required="required" min="0" max="9" maxlength="1"/>
+        </td>    
+      </tr>
+      <tr>
+        <td style="text-align: center;">
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="btn btn-danger">Verify</button>
+            </div>
+         </div>
+       </td>
+      </tr>
+     </table>
+  </form>
+
+<script type="text/javascript">
+  var countDownDate = new Date("{{code_valid_until}}");
+  console.log(countDownDate);
+  var x = setInterval(function() {
+    var now = new Date().getTime();
+   
+    var distance = countDownDate - now;
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor(distance  / 1000);
+    // Output the result in an element with id="demo"
+    document.getElementById("countdown").innerHTML = " " + seconds + " seconds";
+      
+    // If the count down is over, write some text 
+    if (distance < 1) {
+      //out of time, now you must render to register page 
+      location.reload()
+    }
+  }, 1000);
+
+</script>
+
+{%endblock%}

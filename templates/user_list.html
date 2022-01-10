@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block content %}
+    <ul>
+        {% for us in users %}
+            <li><a href="{{url_for('profile_page', email=us.email)}}">{{us.first_name}} {{us.last_name}}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

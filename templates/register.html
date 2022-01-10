@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+  {% block content %}
+
+<div style="width: 55%; float: left"> 
+  <img class="center" width="100%"  src="{{url_for('static', filename='logo.jpg')}}"></img>
+  <p style="text-align: center; font-family:cursive; font-size: 18px">Traveller Blog</p>
+</div>
+ <div style="width: 45%; float: right;"> 
+
+  <br><br><br><br><br><br>
+  <form action="" method="post" name="register">
+     <table class="table table-hover" style="margin-left: auto;
+      margin-right: auto; width: 50%; float: left; margin-left: 40px">
+      {% if warning %}
+      <p style="color: red; text-align:center ; ">{{warning}}!</p>
+      {% endif %}
+      
+      <tr>
+        <td>
+          <div class="control"> 
+            <input type="text" name="first_name" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" required="required" placeholder="Name"/>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="control"> 
+            <input type="text" name="last_name" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" required="required" placeholder="Surname"/>
+          </div>
+        </td>  
+      </tr>
+      <tr>
+        <td>
+          <div class="control"> 
+            <input type="date" name="birth_date" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" required="required" placeholder="Birth Date"/>
+          </div>
+        </td>  
+      </tr>
+      <tr>
+        <td>
+          <div class="control"> 
+            <input type="email" name="email" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" required="required" placeholder="name@example.com"/>
+          </div>
+        </td>  
+      </tr>
+      <tr>
+        <td>
+          <div class="control"> 
+            <input type="password" name="password1" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" required="required" placeholder="Password"/>
+          </div>
+        </td>  
+      </tr>
+      <tr>
+        <td>
+          <div class="control"> 
+            <input type="password" name="password2" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" required="required" placeholder="Re-enter password"/>
+          </div>
+        </td>  
+      </tr>
+      <tr>
+        <td>
+          <div class="field is-grouped">
+            <div class="control" >
+              <button class="btn btn-success">Sign-up</button>
+            </div>
+         </div>
+       </td>
+      </tr>
+      
+    </table>
+  </form>
+</div>
+{%endblock%}
